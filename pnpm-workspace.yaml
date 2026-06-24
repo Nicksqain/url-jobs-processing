@@ -1,0 +1,10 @@
+packages:
+  - 'backend'
+  - 'frontend'
+allowBuilds:
+  '@scarf/scarf': true
+  '@swc/core': true
+  esbuild: true
+  msgpackr-extract: true
+  sharp: true
+  unrs-resolver: true

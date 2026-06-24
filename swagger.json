@@ -1,0 +1,268 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/jobs": {
+      "post": {
+        "operationId": "JobsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateJobDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Создать новую задачу",
+        "tags": [
+          "Jobs"
+        ]
+      },
+      "get": {
+        "operationId": "JobsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Список заданий с краткой информацией",
+        "tags": [
+          "Jobs"
+        ]
+      }
+    },
+    "/api/jobs/{id}": {
+      "get": {
+        "operationId": "JobsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/JobResponseDto"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "urls": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/UrlResultDto"
+                          }
+                        }
+                      },
+                      "required": [
+                        "urls"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Детальная информация о задании",
+        "tags": [
+          "Jobs"
+        ]
+      },
+      "delete": {
+        "operationId": "JobsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Отменить выполнение задачи",
+        "tags": [
+          "Jobs"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "URL Checker API",
+    "description": "",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "JobStatsDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "number",
+            "example": 5
+          },
+          "error": {
+            "type": "number",
+            "example": 1
+          }
+        },
+        "required": [
+          "success",
+          "error"
+        ]
+      },
+      "JobResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "a9b8c7d6-e5f4-3c2b-1a0z-9876543210fe"
+          },
+          "createdAt": {
+            "type": "string",
+            "example": "2026-06-23T12:00:00.000Z"
+          },
+          "status": {
+            "type": "string",
+            "example": "in_progress",
+            "enum": [
+              "pending",
+              "in_progress",
+              "completed",
+              "cancelled",
+              "failed"
+            ]
+          },
+          "urlsCount": {
+            "type": "number",
+            "example": 10
+          },
+          "stats": {
+            "$ref": "#/components/schemas/JobStatsDto"
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "status",
+          "urlsCount",
+          "stats"
+        ]
+      },
+      "UrlResultDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "example": "https://google.com",
+            "description": "Проверяемый URL-адрес"
+          },
+          "status": {
+            "type": "string",
+            "example": "success",
+            "enum": [
+              "pending",
+              "in_progress",
+              "success",
+              "error",
+              "cancelled"
+            ],
+            "description": "Текущий статус обработки конкретного URL"
+          },
+          "httpStatus": {
+            "type": "number",
+            "example": 200,
+            "description": "HTTP статус-код ответа сервера"
+          },
+          "error": {
+            "type": "string",
+            "example": "Timeout error",
+            "description": "Текст ошибки, если запрос упал"
+          },
+          "duration": {
+            "type": "number",
+            "example": 450,
+            "description": "Время ответа сервера в миллисекундах"
+          },
+          "startedAt": {
+            "type": "string",
+            "example": "2026-06-25T02:01:33.000Z",
+            "description": "Время начала проверки URL"
+          },
+          "finishedAt": {
+            "type": "string",
+            "example": "2026-06-25T02:01:35.000Z",
+            "description": "Время завершения проверки URL"
+          }
+        },
+        "required": [
+          "url",
+          "status"
+        ]
+      },
+      "CreateJobDto": {
+        "type": "object",
+        "properties": {
+          "urls": {
+            "example": [
+              "https://google.com",
+              "https://github.com"
+            ],
+            "description": "Список URL-адресов для параллельной или последовательной проверки",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "urls"
+        ]
+      }
+    }
+  }
+}
