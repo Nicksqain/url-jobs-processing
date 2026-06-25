@@ -1,20 +1,18 @@
 FROM node:23-alpine AS development
-WORKDIR /usr/src/app
+WORKDIR /app
 
 RUN npm i -g pnpm
-
 COPY package.json pnpm-lock.yaml* ./
 
 RUN pnpm config set fetch-retries 5 && \
-    pnpm config set fetch-retry-maxtimeout 60000 && \
-    pnpm config set network-concurrency 1 && \
-    pnpm install --ignore-scripts --no-verify-store-integrity
+    pnpm config set fetch-retry-maxtimeout 600000 && \
+    pnpm install --ignore-scripts
 
 COPY . .
 RUN pnpm run build
 
 FROM node:23-alpine AS production
-WORKDIR /usr/src/app
+WORKDIR /app
 RUN npm i -g pnpm
 
 COPY package.json pnpm-lock.yaml* ./
@@ -24,6 +22,10 @@ RUN pnpm config set fetch-retries 5 && \
     pnpm config set network-concurrency 1 && \
     pnpm install --ignore-scripts --no-verify-store-integrity
 
-COPY --from=development /usr/src/app/dist ./dist
+COPY --from=development /app/.next ./.next
+COPY --from=development /app/public ./public
+COPY --from=development /app/package.json ./package.json
+
 EXPOSE 3000
-CMD ["node", "dist/main"]
+
+CMD ["pnpm", "start"]
