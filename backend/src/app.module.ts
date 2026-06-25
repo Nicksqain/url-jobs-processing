@@ -19,12 +19,16 @@ import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis'
           limit: 5,
         },
       ],
-      storage: new ThrottlerStorageRedisService(),
+      storage: new ThrottlerStorageRedisService({
+        host: process.env.REDIS_HOST || 'localhost',
+        port: Number(process.env.REDIS_PORT) || 6379,
+      }),
     }),
     BullModule.forRoot(
       {
         connection: {
-          host: process.env.REDIS_HOST || 'localhost', port: 6379
+          host: process.env.REDIS_HOST || 'localhost',
+          port: Number(process.env.REDIS_PORT) || 6379
         }
       }),
     JobsModule
